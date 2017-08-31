@@ -1,6 +1,9 @@
 <?xml version="1.0" ?>
 <robot name="baxter" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
   <xacro:arg name="gazebo" default="false"/>
+  <xacro:arg name="kinect" default="false"/>
+  
   <xacro:if value="$(arg gazebo)">
     <!-- Gazebo Tags -->
     <xacro:include filename="$(find baxter_description)/urdf/baxter_base/baxter_base.gazebo.xacro" />
@@ -874,6 +877,45 @@
       <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
     </inertial>
   </link>
+
+  <!-- Kinect Depth Sensor -->
+  <xacro:if value="$(arg kinect)">
+
+    <joint name="kinect_joint" type="fixed">
+      <origin rpy="0 0 0" xyz="0.3 0 0"/>
+      <parent link="base"/>
+      <child link="kinect_link"/>
+    </joint>
+
+    <link name="kinect_link">
+      <collision name="collision">
+        <origin rpy="0 0 0"
+                xyz="0 0 0"/>
+        <geometry>
+          <box size="0.073000 0.276000 0.072000"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0 0 0"
+                xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://baxter_description/meshes/kinect/meshes/kinect.dae"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="kinect_depth_joint" type="fixed">
+      <origin rpy="${-M_PI/2} 0 ${-M_PI/2}"
+              xyz="0 0 0"/>
+      <parent link="kinect_link" />
+      <child link="kinect_depth_frame" />
+    </joint>
+
+    <link name="kinect_depth_frame">
+    </link>
+
+  </xacro:if>
+
   <joint name="left_torso_arm_mount" type="fixed">
     <origin rpy="0 0 0.7854" xyz="0.024645 0.219645 0.118588"/>
     <parent link="torso"/>
